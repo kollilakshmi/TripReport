@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trip Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Vehicle Trip Report</h1>
+
+    <form method="POST" action="/">
+
+        <label>Date</label>
+        <input
+    type="date"
+    name="date"
+    value="{{ edit_trip.date if edit_trip else '' }}"
+    required>
+
+        <label>Work</label>
+        <textarea name="work" rows="4" required>{{ edit_trip.work if edit_trip else '' }}</textarea>
+
+        <label>Amount</label>
+        <input
+    type="number"
+    name="amount"
+    value="{{ edit_trip.amount if edit_trip else '' }}"
+    required>
+
+    <input
+    type="hidden"
+    name="edit_index"
+    value="{{ edit_index if edit_index is not none else '' }}">
+
+        <br><br>
+
+        <button type="submit">
+    {% if edit_trip %}
+        Update Row
+    {% else %}
+        Add Row
+    {% endif %}
+</button>
+
+    </form>
+
+    {% if trips %}
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+
+    <h2>Trips</h2>
+
+    <a href="/clear" onclick="return confirm('Clear all trips?');">
+    <button type="button">Clear Trips</button>
+</a>
+
+</div>
+
+<table border="1" cellpadding="8">
+
+    <tr>
+        <th>Date</th>
+        <th>Work</th>
+        <th>Amount</th>
+        <th>Action</th>
+    </tr>
+
+    {% set total = namespace(value=0) %}
+
+    {% for trip in trips %}
+
+    {% set total.value = total.value + trip.amount|int %}
+
+    <tr>
+        <td>{{ trip.date }}</td>
+        <td>{{ trip.work }}</td>
+        <td>{{ trip.amount }}</td>
+
+        <td>
+    <a href="/edit/{{ loop.index0 }}">Edit</a> |
+    <a href="/delete/{{ loop.index0 }}">Delete</a>
+</td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+<h3>Total Amount : ₹{{ total.value }}</h3>
+
+{% endif %}
+
+<form action="/generate_pdf" method="POST">
+
+    <label>File Name</label>
+    <input
+        type="text"
+        name="filename"
+        placeholder="Enter file name"
+        required>
+
+    <br><br>
+
+    <button type="submit">
+        Generate PDF
+    </button>
+
+</form>
+
+</div>
+
+</body>
+</html>
